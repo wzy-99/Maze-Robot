@@ -27,3 +27,6 @@ class PD:
 
     def clear(self):
         pass
+
+    def set_target(self, target):
+        self.target = target

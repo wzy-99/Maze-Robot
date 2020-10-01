@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import traceback
-from peripheral import Encoder, Motor
+from peripheral import Encoder, Motor, InfraRed
 from kinematic import KinematicControl
 from constant import DirctionEnum
 
 import rospy
 from car.msg import Speed
+from car.msg import Detection
 from std_msgs.msg import Int32
 
 
@@ -25,6 +26,8 @@ class ServoSystem:
         self.right_encode = Encoder()
         self.left_motor = Motor()
         self.right_motor = Motor()
+        self.left_infrared = InfraRed()
+        self.right_infrared = InfraRed()
 
         # loacl variable
         self.left_speed = 0
@@ -35,6 +38,7 @@ class ServoSystem:
         self.speed_change = False
 
         self.pub_ngrid = rospy.Publish("/new_grid", Int32, queue_size=1)
+        self.pub_detect = rospy.Publish("/detect_obstacle", Detection, queue_size=1)
         self.sub_speed = rospy.Subscriber("/auto_speed", Speed, self.speedcallback, queue_size=10)
 
     def speedcallback(self, msg):
@@ -58,6 +62,7 @@ class ServoSystem:
             self.speed_change = False
         if self.left_encode.new_grid():
             self.pub_ngrid.publish(1)
+        if self.
 
 
 if __name__ == '__main__':

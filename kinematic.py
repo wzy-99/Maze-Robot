@@ -4,8 +4,10 @@ from peripheral import Motor, Encoder
 from constant import DirctionEnum
 
 
+# In this class, kinematic control method is defined, such as turn back, turn right and so on.
+# And you should know that belowed methond is high-level control one rather than basic control methond.
 class KinematicControl:
-    def __init__(self):
+    def __init__(self, motor_instance):
 
         dir_enum = DirctionEnum()
         self.forward = dir_enum.dir_forward
@@ -14,16 +16,18 @@ class KinematicControl:
         self.back = dir_enum.dir_back
         del dir_enum
 
-        self.direction = self.forward
-
-        self.left_motor = Motor()
-        self.right_motor = Motor()
-
+        # config variable
         self.turn_speed = 10
 
-        # temp
+        # motor instance
+        self.left_motor, self.right_motor = motor_instance
+
+        # local variable
         self.left_speed = 0
         self.right_speed = 0
+        # positin direction which contains 4 kinds of direction
+        # notice this is not drive angle whice is from 0 to 100
+        self.direction = self.forward
 
     def turn_right(self):
         self.left_motor.set_forword()
@@ -63,8 +67,8 @@ class KinematicControl:
         self.left_motor.set_speed(self.left_speed)
         self.right_motor.set_speed(self.right_speed)
 
-    def dif_speed(self, speed, diretion):
-        pass
-
-    def encode_run(self):
+    def dif_speed(self, speed, angle):
+        # TODO dif speed algorithm
+        self.left_speed = speed * angle / 100
+        self.right_speed = speed * angle / 100
 

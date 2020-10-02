@@ -8,12 +8,12 @@ from constant import DirctionEnum, EncodeInfo
 
 class Motor:
     def __init__(self, pin1, pin2, enable, a, b):
-        dir_enum = DirctionEnum()
-        self.forward = dir_enum.dir_forward
-        self.back = dir_enum.dir_back
-        self.left = dir_enum.dir_left
-        self.right = dir_enum.dir_right
-        del dir_enum
+        enum = DirctionEnum()
+        self.forward = enum.dir_forward
+        self.back = enum.dir_back
+        self.left = enum.dir_left
+        self.right = enum.dir_right
+        del enum
 
         # config
         self.kp = 1.0
@@ -50,15 +50,18 @@ class Motor:
         self.pd.set_target(self.target_speed)
 
     def set_pwm(self, speed):
+        # TODO stop last pwm
         self.pwm_value = speed * self.pwm_k
         self.pwm = self.pwm.start(self.pwm)
 
     def set_forword(self):
+        # TODO delect last pwm object
         self.pwm.stop()
         self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
         GPIO.output(self.pin2, 0)
 
     def set_back(self):
+        # TODO delect last pwm object
         self.pwm.stop()
         self.pwm = GPIO.PWM(self.pin2, self.pwm_frq)
         GPIO.output(self.pin1, 0)
@@ -72,6 +75,7 @@ class Motor:
     def spin(self):
         self.current_speed = self.encode.get_actual_speed()
         speed = self.pd.update(self.current_speed)
+        speed = min(max(speed, self.min_speed), self.max_speed)
         self.set_pwm(speed)
 
     def __del__(self):
@@ -103,13 +107,11 @@ class InfraRed:
         # TODO resistance pull up or down
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    def get_distance(self):
-        pass
-
-    def get_pwm(self):
-        pass
-
     def check_obstacle(self):
+        self.obstacle = GPIO.input(self.pin)
+        return self.obstacle
+
+    def spin(self):
         self.obstacle = GPIO.input(self.pin)
         return self.obstacle
 
@@ -165,6 +167,7 @@ class Encoder:
         # TODO resistance pull up or down
         GPIO.setup(self.A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # Callback drive, thus no need to spin every time
         GPIO.add_event_detect(self.A, GPIO.RISING, callback=self.count_callback)
 
     def count_callback(self):

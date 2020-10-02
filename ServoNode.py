@@ -2,7 +2,6 @@
 
 import traceback
 from peripheral import Encoder, Motor, InfraRed
-from kinematic import KinematicControl
 from constant import DirctionEnum
 
 import rospy
@@ -60,9 +59,18 @@ class ServoSystem:
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
             self.speed_change = False
+        # if car enter new grid, then publush true to maze solution
         if self.left_encode.new_grid():
             self.pub_ngrid.publish(1)
-        if self.
+
+        # spin
+        self.left_motor.spin()
+        self.right_motor.spin()
+        self.left_infrared.spin()
+        self.right_infrared.spin()
+
+        # TODO get detection info and publish info
+        self.pub_detect.publish()
 
 
 if __name__ == '__main__':

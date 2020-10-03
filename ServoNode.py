@@ -2,6 +2,7 @@
 
 import traceback
 from peripheral import Encoder, Motor, InfraRed
+from kinematic import KinematicControl
 from constant import DirctionEnum
 
 import rospy
@@ -28,6 +29,9 @@ class ServoSystem:
         self.left_infrared = InfraRed()
         self.right_infrared = InfraRed()
 
+        # control instance
+        self.kinematic = KinematicControl((self.left_motor, self.right_motor))
+
         # loacl variable
         self.left_speed = 0
         self.right_speed = 0
@@ -38,7 +42,20 @@ class ServoSystem:
 
         self.pub_ngrid = rospy.Publish("/new_grid", Int32, queue_size=1)
         self.pub_detect = rospy.Publish("/detect_obstacle", Detection, queue_size=1)
-        self.sub_speed = rospy.Subscriber("/auto_speed", Speed, self.speedcallback, queue_size=10)
+        rospy.Subscriber("/turn", Int32, self.turncallback, queue_size=1)
+        rospy.Subscriber("/speed", Int32, self.speedcallback, queue_size=10)
+
+    def turncallback(self, msg):
+        self.block = True
+        if msg.data == self.left:
+            self.kinematic.turn_left()
+        elif msg.data == self.right:
+            self.kinematic.turn_right()
+        self.block = False
+
+    def motioncallback(self, msg):
+        self.kinematic ==
+
 
     def speedcallback(self, msg):
         if self.left_dir != msg.left_dir or self.right_dir != msg.right_dir:
@@ -52,8 +69,7 @@ class ServoSystem:
 
     def spin(self):
         if self.dir_change:
-            self.left_motor.set_direction(self.left_dir)
-            self.right_motor.set_direction(self.right_motor)
+
             self.dir_change = False
         if self.speed_change:
             self.left_motor.set_speed(self.left_speed)

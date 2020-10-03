@@ -11,8 +11,8 @@ class KinematicControl:
 
         dir_enum = DirctionEnum()
         self.forward = dir_enum.dir_forward
-        self.left = dir_enum.dir_left
-        self.right = dir_enum.dir_right
+        # self.left = dir_enum.dir_left
+        # self.right = dir_enum.dir_right
         self.back = dir_enum.dir_back
         del dir_enum
 
@@ -30,40 +30,42 @@ class KinematicControl:
         self.direction = self.forward
 
     def turn_right(self):
+        # TODO turn right
         self.left_motor.set_forword()
         self.right_motor.set_back()
-        pass
 
     def turn_left(self):
+        # TODO turn left
         self.left_motor.set_forword()
         self.right_motor.set_back()
-        pass
 
-    def turn_back(self):
-        pass
+    # def turn_back(self):
+    #     pass
 
-    def turn(self, dirction):
-        if self.direction == dirction:
-            return
-        else:
-            if dirction == self.right:
-                self.turn_right()
-            elif dirction == self.left:
-                self.turn_left()
-            else:
-                pass
+    # def turn(self, dirction):
+    #     if self.direction == dirction:
+    #         return
+    #     else:
+    #         if dirction == self.right:
+    #             self.turn_right()
+    #         elif dirction == self.left:
+    #             self.turn_left()
+    #         else:
+    #             pass
 
-    def go_ahead(self, speed, diretion):
-        self.left_motor.set_forword()
-        self.right_motor.set_forword()
-        self.dif_speed(speed, diretion)
+    def go_ahead(self, speed, angle=50):
+        if self.direction != self.forward:
+            self.left_motor.set_forword()
+            self.right_motor.set_forword()
+        self.dif_speed(speed, angle)
         self.left_motor.set_speed(self.left_speed)
         self.right_motor.set_speed(self.right_speed)
 
-    def go_back(self, speed, diretion):
-        self.left_motor.set_back()
-        self.right_motor.set_back()
-        self.dif_speed(speed, diretion)
+    def go_back(self, speed, angle=50):
+        if self.direction != self.back:
+            self.left_motor.set_back()
+            self.right_motor.set_back()
+        self.dif_speed(speed, angle)
         self.left_motor.set_speed(self.left_speed)
         self.right_motor.set_speed(self.right_speed)
 
@@ -72,3 +74,11 @@ class KinematicControl:
         self.left_speed = speed * angle / 100
         self.right_speed = speed * angle / 100
 
+
+# Car will turn left, turn right, (turn back,) go ahead, go back and stop.
+# When car turn left or turn right, main program will be blocked until turn over.
+# When car go ahead or go back, speed parameter and angle parameter should be given,
+# which are computed by deviation distance between two sides.
+# Thus, a deviation node should be create to computed this and can be blocked when needed.
+# And turn left or turn left can be called by maze solution node.
+#

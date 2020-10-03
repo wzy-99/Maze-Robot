@@ -3,21 +3,19 @@
 import time
 import RPi.GPIO as GPIO
 from pid import PD
-from constant import DirctionEnum, EncodeInfo
+from constant import DirctionEnum, EncodeInfo, Pin
 
 
 class Motor:
-    def __init__(self, pin1, pin2, enable, a, b):
+    def __init__(self, pin1, pin2, enable, a, b, kp=1.0, kd=1.0):
         enum = DirctionEnum()
         self.forward = enum.dir_forward
         self.back = enum.dir_back
-        self.left = enum.dir_left
-        self.right = enum.dir_right
         del enum
 
         # config
-        self.kp = 1.0
-        self.kd = 1.0
+        self.kp = kp
+        self.kd = kd
         self.max_speed = 100
         self.min_speed = 0
         self.pwm_k = 0.01
@@ -44,6 +42,7 @@ class Motor:
         GPIO.setup(self.pin2, GPIO.OUT, )
         if self.enable is not None:
             GPIO.setup(self.enable, GPIO.OUT, )
+            GPIO.output(self.enable, 1)
 
     def set_speed(self, speed):
         self.target_speed = min(max(speed, self.min_speed), self.max_speed)
@@ -210,3 +209,17 @@ class Encoder:
             return True
         else:
             return False
+
+
+# for test
+if __name__ == '__main__':
+    pin_conf = Pin()
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin_conf.left_pin1, GPIO.OUT, pull_up_down=GPIO.PUD_UP, initial=GPIO.HIGH)
+    GPIO.setup(pin_conf.left_pin2, GPIO.OUT, pull_up_down=GPIO.PUD_UP, initial=GPIO.LOW)
+    GPIO.setup(pin_conf.left_enale, GPIO.OUT, pull_up_down=GPIO.PUD_UP, initial=GPIO.HIGH)
+
+    # left_motor = Motor(pin_conf.left_pin1,
+    #                    pin_conf.left_pin2,
+    #                    pin_conf.left_enale,
+    #                    None, None)

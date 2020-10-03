@@ -37,9 +37,39 @@ class DirctionEnum:
         self.dir_left = 0
         self.dir_right = 2
         self.dir_back = -1
+        self.dir_up = 3
+        self.dir_down = 4
 
 
 class EncodeInfo:
     def __init__(self):
         self.count_per_cm = 50
         self.cm_per_grid = 50
+
+
+class Pin:
+    def __init__(self):
+
+        # # physical pins
+        # self.IN1_ = 36
+        # self.IN2_ = 35
+        # self.IN3_ = 39
+        # self.IN4_ = 38
+        # self.ENA_ = 34
+        # self.ENB_ = 37
+
+        # bcm pins
+        self.IN1 = 19
+        self.IN2 = 16
+        self.IN3 = 21
+        self.IN4 = 26
+        self.ENA = 13
+        self.ENB = 20
+
+        # motor pins
+        self.left_pin1 = self.IN1
+        self.left_pin2 = self.IN2
+        self.left_enale = self.ENA
+        self.right_pin1 = self.IN3
+        self.right_pin2 = self.IN4
+        self.right_enale = self.ENB

@@ -32,6 +32,7 @@ class MazeSolution:
 
         self.create_map()
 
+        self.pub_turn = rospy.Publish("/turn", Int32, queue_size=1)
         rospy.Subscriber("/grid", Int32, self.gridcallback, queue_size=3)
         rospy.Subscriber("/detect", Int32, self.detectcallback, queue_size=3)
 
@@ -47,7 +48,7 @@ class MazeSolution:
     def detectcallback(self, msg):
         """
         Current detection result will be published cosntantly.
-        :param msg: Int32, [0:3] is left, right, front and back detion result.
+        :param msg: Int32, [0:3] bit is left, right, front and back detection result.
         """
         # TODO: make use of mean filtering to advoid accident err.
 
@@ -62,7 +63,11 @@ class MazeSolution:
 
 
     def spin(self):
-        pass
+        if self.is_new_grid:
+            # TODO: compute next direction.
+            #  If car needs to turn direction, then publish turn dirction, else keeping.
+
+            self.is_new_grid = False
 
 
 if __name__ == '__main__':

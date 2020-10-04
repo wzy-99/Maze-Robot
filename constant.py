@@ -39,6 +39,7 @@ class DirctionEnum:
         self.dir_back = -1
         self.dir_up = 3
         self.dir_down = 4
+        self.dir_none = 5
 
 
 class EncodeInfo:

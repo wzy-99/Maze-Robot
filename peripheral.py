@@ -37,12 +37,10 @@ class Motor:
         self.init()
 
     def init(self):
-        # TODO resistance pull up or down
-        GPIO.setup(self.pin1, GPIO.OUT, )
-        GPIO.setup(self.pin2, GPIO.OUT, )
+        GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
         if self.enable is not None:
-            GPIO.setup(self.enable, GPIO.OUT, )
-            GPIO.output(self.enable, 1)
+            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.High)
 
     def set_speed(self, speed):
         self.target_speed = min(max(speed, self.min_speed), self.max_speed)
@@ -51,7 +49,7 @@ class Motor:
     def set_pwm(self, speed):
         # TODO stop last pwm
         self.pwm_value = speed * self.pwm_k
-        self.pwm = self.pwm.start(self.pwm)
+        self.pwm = self.pwm.start(self.pwm_value)
 
     def set_forword(self):
         # TODO delect last pwm object
@@ -81,6 +79,74 @@ class Motor:
         pass
 
 
+class MotorOpen:
+    def __init__(self, pin1, pin2, enable):
+        enum = DirctionEnum()
+        self.forward = enum.dir_forward
+        self.back = enum.dir_back
+        del enum
+
+        # config
+        self.max_speed = 100
+        self.min_speed = 0
+        self.pwm_k = 0.01
+        self.pwm_frq = 1000
+
+        self.pin1 = pin1
+        self.pin2 = pin2
+        self.enable = enable
+
+        self.pwm_value = 0
+        self.speed = 0
+        self.pwm = None
+        self.dir = self.forward
+
+        self.init()
+
+    def init(self):
+        # GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
+        if self.enable is not None:
+            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.High)
+        self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
+        self.pwm.start(0)
+
+    def set_speed(self, speed):
+        self.speed = min(max(speed, self.min_speed), self.max_speed)
+
+    def set_pwm(self):
+        self.pwm_value = self.speed * self.pwm_k
+
+    def pwm_output(self):
+        self.pwm.chaneDuty(self.pwm_value)
+
+    def set_forword(self):
+        # TODO delect last pwm object
+        self.pwm.stop()
+        self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
+        GPIO.output(self.pin2, GPIO.LOW)
+
+    def set_back(self):
+        # TODO delect last pwm object
+        self.pwm.stop()
+        self.pwm = GPIO.PWM(self.pin2, self.pwm_frq)
+        GPIO.output(self.pin1, GPIO.LOW)
+
+    def set_direction(self, dirction):
+        if dirction == self.forward:
+            self.set_forword()
+        elif dirction == self.back:
+            self.set_back()
+
+    def spin(self):
+        self.pwm_output()
+
+    def __del__(self):
+        if self.pwm is not None:
+            self.pwm.stop()
+            del self.pwm
+
+
 class Steer:
     def __init__(self, pin):
         self.pin = pin
@@ -103,8 +169,7 @@ class InfraRed:
         self.init()
 
     def init(self):
-        # TODO resistance pull up or down
-        GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.pin, GPIO.IN)
 
     def check_obstacle(self):
         self.obstacle = GPIO.input(self.pin)
@@ -164,8 +229,8 @@ class Encoder:
 
     def init(self):
         # TODO resistance pull up or down
-        GPIO.setup(self.A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(self.B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.A, GPIO.IN)
+        GPIO.setup(self.B, GPIO.IN)
         # Callback drive, thus no need to spin every time
         GPIO.add_event_detect(self.A, GPIO.RISING, callback=self.count_callback)
 

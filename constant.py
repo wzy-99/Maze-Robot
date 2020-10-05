@@ -3,13 +3,12 @@
 
 class Command:
     def __init__(self):
-        self.command_head = ord('@')
-        self.command_speed = ord('s')
-        self.command_dirtion = ord('d')
-        self.command_left_speed = ord('l')
-        self.command_right_speed = ord('r')
-        self.command_stop = ord('s')
-        self.command_run = ord('r')
+        self.head = ord('@')
+        self.speed = ord('s')
+        self.angle = ord('d')
+        self.turn = ord('t')
+        self.stop = ord('s')
+        self.run = ord('r')
 
 
 class MazeInfo:
@@ -52,14 +51,6 @@ class EncodeInfo:
 class Pin:
     def __init__(self):
 
-        # # physical pins
-        # self.IN1_ = 36
-        # self.IN2_ = 35
-        # self.IN3_ = 39
-        # self.IN4_ = 38
-        # self.ENA_ = 34
-        # self.ENB_ = 37
-
         # bcm pins
         self.IN1 = 19
         self.IN2 = 16
@@ -75,3 +66,10 @@ class Pin:
         self.right_pin1 = self.IN3
         self.right_pin2 = self.IN4
         self.right_enale = self.ENB
+
+        self.IR_L = 27
+        self.IR_R = 18
+
+        # infrad pin
+        self.left_infra_pin = self.IR_L
+        self.right_infra_pin = self.IR_R

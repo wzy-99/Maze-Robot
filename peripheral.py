@@ -40,7 +40,7 @@ class Motor:
         GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
         if self.enable is not None:
-            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.High)
+            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.HIGH)
 
     def set_speed(self, speed):
         self.target_speed = min(max(speed, self.min_speed), self.max_speed)
@@ -104,10 +104,10 @@ class MotorOpen:
         self.init()
 
     def init(self):
-        # GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
         if self.enable is not None:
-            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.High)
+            GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.HIGH)
         self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
         self.pwm.start(0)
 
@@ -318,11 +318,7 @@ class Encoder:
 if __name__ == '__main__':
     pin_conf = Pin()
     GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
     GPIO.setup(pin_conf.left_pin1, GPIO.OUT, initial=GPIO.HIGH)
     GPIO.setup(pin_conf.left_pin2, GPIO.OUT, initial=GPIO.LOW)
     GPIO.setup(pin_conf.left_enale, GPIO.OUT, initial=GPIO.HIGH)
-
-    # left_motor = Motor(pin_conf.left_pin1,
-    #                    pin_conf.left_pin2,
-    #                    pin_conf.left_enale,
-    #                    None, None)

@@ -106,7 +106,7 @@ class KinematicControl:
 
     def spin(self):
         if self.state == self.run_forward:
-            self.run_forward()
+            self.go_forward()
         elif self.state == self.turn_left:
             self.go_left()
         elif self.state == self.turn_right:

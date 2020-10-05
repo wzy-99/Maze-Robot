@@ -3,6 +3,7 @@
 
 class Command:
     def __init__(self):
+        self.command_head = ord('@')
         self.command_speed = ord('s')
         self.command_dirtion = ord('d')
         self.command_left_speed = ord('l')

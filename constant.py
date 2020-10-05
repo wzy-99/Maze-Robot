@@ -6,9 +6,7 @@ class Command:
         self.head = ord('@')
         self.speed = ord('s')
         self.angle = ord('d')
-        self.turn = ord('t')
-        self.stop = ord('s')
-        self.run = ord('r')
+        self.state = ord('t')
 
 
 class MazeInfo:
@@ -29,6 +27,16 @@ class RunMode:
 class MotionInfo:
     def __init__(self):
         self.turn_speed = 10
+
+
+class StateEnum:
+    def __init__(self):
+        self.stop = -1
+        self.run_forward = 0
+        self.run_back = 1
+        self.turn_left = 2
+        self.turn_right = 3
+        self.turn_back = 4
 
 
 class DirctionEnum:

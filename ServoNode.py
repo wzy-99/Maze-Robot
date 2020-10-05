@@ -36,11 +36,11 @@ class ServoSystem:
 
         self.pub_grid = rospy.Publisher("/grid", Int32, queue_size=1)
         self.pub_detect = rospy.Publisher("/detect", Int32, queue_size=1)
-        rospy.Subscriber("/turn", Int32, self.turncallback, queue_size=1)
+        rospy.Subscriber("/state", Int32, self.statecallback, queue_size=1)
         rospy.Subscriber("/speed", Int32, self.speedcallback, queue_size=10)
         rospy.Subscriber("/angle", Int32, self.anglecallback, queue_size=10)
 
-    def turncallback(self, msg):
+    def statecallback(self, msg):
         self.kinematic.set_state(msg.data)
 
     def speedcallback(self, msg):

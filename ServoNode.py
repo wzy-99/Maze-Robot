@@ -19,16 +19,17 @@ class ServoSystem:
 
         # pins config
         pins = Pin()
-
         # peripheral instance
         # self.left_encode = Encoder()
         # self.right_encode = Encoder()
         self.left_motor = MotorOpen(pins.left_pin1, pins.left_pin2, pins.left_enale)
         self.right_motor = MotorOpen(pins.right_pin1, pins.right_pin2, pins.right_enale)
+        # self.font_infrared = InfraRed(pins.font_infra_pin)
         self.left_infrared = InfraRed(pins.left_infra_pin)
         self.right_infrared = InfraRed(pins.right_infra_pin)
         # self.font_rader = Radar()
-
+        # self.left_rader = Radar()
+        # self.right_rader = Radar()
         del pins
 
         # control instance
@@ -52,7 +53,12 @@ class ServoSystem:
     # def encode_spin(self):
     #     left_grid = self.left_encode.get_grid()
     #     right_grid = self.right_encode.get_grid()
-    #     grid = int(left_grid + right_grid / 2)
+    #     grid = (left_grid + right_grid) // 2
+    #     self.pub_grid.publish(grid)
+
+    # def encode_single_spin(self):
+    #     left_grid = self.left_encode.get_grid()
+    #     grid = left_grid // 2
     #     self.pub_grid.publish(grid)
 
     def infrared_spin(self):
@@ -60,6 +66,11 @@ class ServoSystem:
         right_detect = self.right_infrared.check_obstacle()
         result = left_detect * 10 + right_detect
         self.pub_detect.publish(result)
+
+    # def radar_spin(self):
+    #     left_distance = self.left_rader.get_distance()
+    #     right_distance = self.right_rader.get_distance()
+    #     self.kinematic.adjust_angle(left_distance, right_distance)
 
     def spin(self):
         self.kinematic.spin()

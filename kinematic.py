@@ -2,6 +2,7 @@
 
 import time
 from constant import StateEnum
+from pid import PD
 
 
 # In this class, kinematic control method is defined, such as turn back, turn right and so on.
@@ -21,6 +22,8 @@ class KinematicControl:
         # config variable
         self.turn_speed = 100
         self.turn_dtime = 10
+        self.adjust_k = 0.05
+        self.angle_pd = PD(kd=-1.0, kp=-1.0, target=50.0)
 
         # motor instance
         self.left_motor, self.right_motor = motor_instance
@@ -123,6 +126,10 @@ class KinematicControl:
         else:
             self.left_motor.set_speed(0)
             self.right_motor.set_speed(0)
+
+    def adjust_angle(self, left_distance, right_distance):
+        d_distance = left_distance - right_distance
+        self.angle = self.angle_pd.update(d_distance * self.adjust_k)
 
     def dif_speed(self, speed, angle):
         # TODO dif speed algorithm

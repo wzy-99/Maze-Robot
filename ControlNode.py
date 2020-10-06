@@ -1,17 +1,17 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import socket
 import struct
 import traceback
 import threading
 from constant import Command
-from server import Server
+from server import Server, get_host_ip
 
 import rospy
 from std_msgs.msg import Int32
 
 
-HOST = socket.gethostbyname(socket.gethostname())
+HOST = get_host_ip()
 
 command = Command()
 
@@ -51,6 +51,8 @@ def run(client):
                     pub_angle.publish(data1)
                 elif code == command.state:
                     pub_state.publish(data1)
+                elif code == 'q':
+                    client.close()
             else:
                 continue
         except socket.error as e:

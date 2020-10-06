@@ -1,12 +1,12 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 
 class Command:
     def __init__(self):
-        self.head = ord('@')
-        self.speed = ord('s')
-        self.angle = ord('d')
-        self.state = ord('t')
+        self.head = '@'
+        self.speed = 's'
+        self.angle = 'd'
+        self.state = 't'
 
 
 class MazeInfo:

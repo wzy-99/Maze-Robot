@@ -1,6 +1,7 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import time
+import math
 from constant import StateEnum
 from pid import PD
 
@@ -27,6 +28,10 @@ class KinematicControl:
 
         # motor instance
         self.left_motor, self.right_motor = motor_instance
+
+        # inital state is forward
+        # inital speed is 0
+        # inital angle is 50
 
         # local variable
         self.angle = 50
@@ -133,8 +138,15 @@ class KinematicControl:
 
     def dif_speed(self, speed, angle):
         # TODO dif speed algorithm
-        self.left_speed = speed * angle / 100
-        self.right_speed = speed * angle / 100
+        angle = (1 - angle / 100) * math.pi
+        y_speed = speed * math.sin(angle)
+        x_speed = speed * math.cos(angle)
+        # when car turn left, angle > 90, x_speed < 0;
+        # when car turn right, angle < 90, x_speed > 0.
+        self.left_speed = y_speed + x_speed // 2
+        self.right_speed = y_speed - x_speed // 2
+        self.left_speed = max(0, min(100, self.left_speed))
+        self.right_speed = max(0, min(100, self.right_speed))
 
     def spin(self):
         if self.state == self.run_forward:

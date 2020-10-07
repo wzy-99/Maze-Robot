@@ -71,8 +71,8 @@ class Pin:
         self.left_pin1 = self.IN1
         self.left_pin2 = self.IN2
         self.left_enale = self.ENA
-        self.right_pin1 = self.IN3
-        self.right_pin2 = self.IN4
+        self.right_pin1 = self.IN4
+        self.right_pin2 = self.IN3
         self.right_enale = self.ENB
 
         self.IR_L = 27

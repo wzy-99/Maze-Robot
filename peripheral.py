@@ -2,91 +2,18 @@
 
 import time
 import RPi.GPIO as GPIO
-from pid import PD
-from constant import DirctionEnum, EncodeInfo
-
-
-# class MotorClose:
-#     def __init__(self, pin1, pin2, enable, a, b, kp=1.0, kd=1.0):
-#         enum = DirctionEnum()
-#         self.forward = enum.dir_forward
-#         self.back = enum.dir_back
-#         del enum
-#
-#         # config
-#         self.kp = kp
-#         self.kd = kd
-#         self.max_speed = 100
-#         self.min_speed = 0
-#         self.pwm_k = 0.01
-#         self.pwm_frq = 1000
-#
-#         self.pin1 = pin1
-#         self.pin2 = pin2
-#         self.enable = enable
-#
-#         self.pwm_value = 0
-#         self.target_speed = 0
-#         self.current_speed = 0
-#         self.dir = self.forward
-#
-#         self.encode = Encoder(a, b)
-#         self.pwm = GPIO.PWM(pin1, self.pwm_frq)
-#         self.pd = PD(self.kp, self.kd, self.target_speed)
-#
-#         self.init()
-#
-#     def init(self):
-#         GPIO.setup(self.pin1, GPIO.OUT, initial=GPIO.LOW)
-#         GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
-#         if self.enable is not None:
-#             GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.HIGH)
-#
-#     def set_speed(self, speed):
-#         self.target_speed = min(max(speed, self.min_speed), self.max_speed)
-#         self.pd.set_target(self.target_speed)
-#
-#     def set_pwm(self, speed):
-#         self.pwm_value = speed * self.pwm_k
-#         self.pwm = self.pwm.start(self.pwm_value)
-#
-#     def set_forword(self):
-#         self.pwm.stop()
-#         self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
-#         GPIO.output(self.pin2, 0)
-#
-#     def set_back(self):
-#         self.pwm.stop()
-#         self.pwm = GPIO.PWM(self.pin2, self.pwm_frq)
-#         GPIO.output(self.pin1, 0)
-#
-#     def set_direction(self, dirction):
-#         if dirction == self.forward:
-#             self.set_forword()
-#         elif dirction == self.back:
-#             self.set_back()
-#
-#     def spin(self):
-#         self.current_speed = self.encode.get_actual_speed()
-#         speed = self.pd.update(self.current_speed)
-#         speed = min(max(speed, self.min_speed), self.max_speed)
-#         self.set_pwm(speed)
-#
-#     def __del__(self):
-#         pass
+from constant import EncodeInfo
 
 
 class MotorOpen:
     def __init__(self, pin1, pin2, enable):
-        enum = DirctionEnum()
-        self.forward = enum.dir_forward
-        self.back = enum.dir_back
-        del enum
+        self.forward = 1
+        self.back = -1
 
         # config
         self.max_speed = 100
         self.min_speed = 0
-        self.pwm_k = 0.01
+        self.pwm_k = 1
         self.pwm_frq = 1000
 
         self.pin1 = pin1
@@ -95,8 +22,9 @@ class MotorOpen:
 
         self.pwm_value = 0
         self.speed = 0
+        self.pwm1 = None
+        self.pwm2 = None
         self.pwm = None
-        self.dir = self.forward
 
         self.init()
 
@@ -105,29 +33,29 @@ class MotorOpen:
         GPIO.setup(self.pin2, GPIO.OUT, initial=GPIO.LOW)
         if self.enable is not None:
             GPIO.setup(self.enable, GPIO.OUT, initial=GPIO.HIGH)
-        self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
-        self.pwm.start(0)
+        self.pwm1 = GPIO.PWM(self.pin1, self.pwm_frq)
+        self.pwm2 = GPIO.PWM(self.pin2, self.pwm_frq)
+        self.pwm1.start(0)
+        self.pwm2.start(0)
+        self.pwm = self.pwm1
 
     def set_speed(self, speed):
         self.speed = min(max(speed, self.min_speed), self.max_speed)
+        self.set_pwm()
 
     def set_pwm(self):
         self.pwm_value = self.speed * self.pwm_k
 
     def pwm_output(self):
-        self.pwm.chaneDuty(self.pwm_value)
+        self.pwm.ChangeDutyCycle(self.pwm_value)
 
     def set_forword(self):
-        # TODO delect last pwm object
-        self.pwm.stop()
-        self.pwm = GPIO.PWM(self.pin1, self.pwm_frq)
-        GPIO.output(self.pin2, GPIO.LOW)
+        self.pwm = self.pwm1
+        self.pwm2.ChangeDutyCycle(0)
 
     def set_back(self):
-        # TODO delect last pwm object
-        self.pwm.stop()
-        self.pwm = GPIO.PWM(self.pin2, self.pwm_frq)
-        GPIO.output(self.pin1, GPIO.LOW)
+        self.pwm = self.pwm2
+        self.pwm1.ChangeDutyCycle(0)
 
     def set_direction(self, dirction):
         if dirction == self.forward:
@@ -139,9 +67,11 @@ class MotorOpen:
         self.pwm_output()
 
     def __del__(self):
-        if self.pwm is not None:
-            self.pwm.stop()
-            del self.pwm
+        self.pwm1.stop()
+        self.pwm2.stop()
+        # GPIO.cleanup(self.pin1)
+        # GPIO.cleanup(self.pin2)
+        # GPIO.cleanup(self.enable)
 
 
 class InfraRed:
@@ -291,7 +221,21 @@ if __name__ == '__main__':
     from constant import Pin
     pin_conf = Pin()
     GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    GPIO.setup(pin_conf.left_pin1, GPIO.OUT, initial=GPIO.HIGH)
-    GPIO.setup(pin_conf.left_pin2, GPIO.OUT, initial=GPIO.LOW)
-    GPIO.setup(pin_conf.left_enale, GPIO.OUT, initial=GPIO.HIGH)
+    # GPIO.setwarnings(False)
+    motor_left = MotorOpen(pin_conf.left_pin1, pin_conf.left_pin2, pin_conf.left_enale)
+    motor_right = MotorOpen(pin_conf.right_pin1, pin_conf.right_pin2, pin_conf.right_enale)
+    motor_left.set_speed(100)
+    motor_right.set_speed(100)
+    motor_left.spin()
+    motor_right.spin()
+    time.sleep(1)
+    motor_left.set_back()
+    motor_right.set_back()
+    motor_left.spin()
+    motor_right.spin()
+    time.sleep(1)
+    motor_left.set_forword()
+    motor_right.set_forword()
+    motor_left.spin()
+    motor_right.spin()
+    time.sleep(1)

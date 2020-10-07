@@ -62,9 +62,11 @@ class ServoSystem:
     #     self.pub_grid.publish(grid)
 
     def infrared_spin(self):
+        font_detect = 0
+        back_detect = 0
         left_detect = self.left_infrared.check_obstacle()
         right_detect = self.right_infrared.check_obstacle()
-        result = left_detect * 10 + right_detect
+        result = font_detect * 1000 + back_detect * 100 + left_detect * 10 + right_detect
         self.pub_detect.publish(result)
 
     # def radar_spin(self):

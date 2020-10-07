@@ -10,6 +10,7 @@ g_img = None
 
 HOST = get_host_ip()
 
+
 class Camera:
     def __init__(self, width, height, device=0):
         self.width = width

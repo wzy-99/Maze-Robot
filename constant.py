@@ -3,10 +3,12 @@
 
 class Command:
     def __init__(self):
-        self.head = '@'
-        self.speed = 's'
-        self.angle = 'd'
-        self.state = 't'
+        self.head = b'@'
+        self.speed = b's'
+        self.angle = b'd'
+        self.state = b't'
+        self.arm = b'a'
+        self.kill = b'k'
 
 
 class MazeInfo:

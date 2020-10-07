@@ -6,10 +6,12 @@ import traceback
 import threading
 from constant import Command
 from server import Server, get_host_ip
+from arm import arm_init, arm_set
 
 import rospy
 from std_msgs.msg import Int32
 
+Servo = XR_Servo()
 
 HOST = get_host_ip()
 
@@ -51,7 +53,9 @@ def run(client):
                     pub_angle.publish(data1)
                 elif code == command.state:
                     pub_state.publish(data1)
-                elif code == 'q':
+                elif code == command.arm:
+                    arm_set(data1, data2)
+                elif code == command.kill:
                     client.close()
             else:
                 continue

@@ -53,6 +53,16 @@ class DirctionEnum:
         self.dir_down = 4
         self.dir_none = 5
 
+        self.dir_b = 0
+        self.dir_f = 1
+        self.dir_l = 2
+        self.dir_r = 3
+
+        self.N = 0
+        self.E = 1
+        self.S = 2
+        self.W = 3
+
 
 class EncodeInfo:
     def __init__(self):

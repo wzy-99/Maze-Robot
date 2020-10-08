@@ -19,7 +19,7 @@ class KinematicControl:
         self.turn_right = state.turn_right
         self.turn_back = state.turn_back
         self.turn_left_unblock = state.turn_left_unblock
-        self.turn_right_unblock = self.turn_right_unblock
+        self.turn_right_unblock = state.turn_right_unblock
         del state
 
         # config variable
@@ -37,11 +37,11 @@ class KinematicControl:
 
         # local variable
         self.angle = 50
-        self.speed = 0
+        self.speed = 100
         self.left_speed = 0
         self.right_speed = 0
-        self.state = self.run_forward
-        self.last_state = self.run_forward
+        self.state = self.stop
+        self.last_state = self.stop
         self.state_change = False
         self.start_time = 0
         self.end_time = 0
@@ -83,7 +83,7 @@ class KinematicControl:
             else:
                 self.start_time = 0
                 self.end_time = 0
-                self.state = self.last_state
+                self.state = self.stop
                 self.state_change = True
                 self.block = False
 
@@ -108,7 +108,7 @@ class KinematicControl:
             else:
                 self.start_time = 0
                 self.end_time = 0
-                self.state = self.last_state
+                self.state = self.stop
                 self.state_change = True
                 self.block = False
 
@@ -163,7 +163,7 @@ class KinematicControl:
             else:
                 self.start_time = 0
                 self.end_time = 0
-                self.state = self.last_state
+                self.state = self.stop
                 self.state_change = True
                 self.block = False
 

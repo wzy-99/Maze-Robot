@@ -1,4 +1,6 @@
+import traceback
 from _XiaoRGEEK_SERVO_ import XR_Servo
+from multiprocessing.connection import Listener
 
 Servo = XR_Servo()
 
@@ -9,10 +11,10 @@ claw_state = 0  # 0 for close, 1 for open
 
 
 def arm_init():
-    Servo.XiaoRGEEK_SetServoAngle(1, 90)
-    Servo.XiaoRGEEK_SetServoAngle(2, 90)
-    Servo.XiaoRGEEK_SetServoAngle(3, 90)
-    Servo.XiaoRGEEK_SetServoAngle(4, 90)
+    Servo.XiaoRGEEK_SetServoAngle(1, 30)
+    Servo.XiaoRGEEK_SetServoAngle(2, 0)
+    Servo.XiaoRGEEK_SetServoAngle(3, 30)
+    Servo.XiaoRGEEK_SetServoAngle(4, 170)
 
 
 def arm_set(num, angle):
@@ -28,6 +30,28 @@ def claw_turn():
     claw_state = 1 - claw_state
 
 
+def echo_client(conn):
+    try:
+        while True:
+            msg = conn.recv()
+            conn.send(msg)
+    except EOFError:
+        print('Connection closed')
+
+
+def echo_server(address, authkey):
+    serv = Listener(address, authkey=authkey)
+    while True:
+        try:
+            client = serv.accept()
+
+            echo_client(client)
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+
+
 # for test
 if __name__ == '__main__':
     arm_init()
+    echo_server(('', 8888), authkey=b'arm')

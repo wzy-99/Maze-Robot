@@ -76,7 +76,7 @@ class ServoSystem:
 
     def spin(self):
         self.kinematic.spin()
-        self.infrared_spin()
+        # self.infrared_spin()
         # self.encode_spin()
 
 

@@ -6,7 +6,7 @@ import traceback
 import threading
 from constant import Command
 from server import Server, get_host_ip
-from arm import arm_init, arm_set, claw_turn
+from multiprocessing.connection import Client
 
 import rospy
 from std_msgs.msg import Int32
@@ -14,6 +14,7 @@ from std_msgs.msg import Int32
 Servo = XR_Servo()
 
 HOST = get_host_ip()
+print(HOST)
 
 command = Command()
 
@@ -21,22 +22,11 @@ pub_speed = rospy.Publisher("speed", Int32, queue_size=1)
 pub_angle = rospy.Publisher("angle", Int32, queue_size=1)
 pub_state = rospy.Publisher("state", Int32, queue_size=1)
 
-
-def recv(client, size, head):
-    bytes_ = []
-    while len(bytes_) < size:
-        recv_ = client.recv(1)
-        if len(bytes_) == 0:
-            if recv_ == head:
-                bytes_ = bytes_ + recv_
-            else:
-                pass
-        else:
-            if recv == command.head:
-                del bytes_
-                bytes_ = []
-            else:
-                bytes_ = bytes_ + recv_
+try:
+    arm_cli = Client(('localhost', 8888), authkey=b'arm')
+except Exception as e:
+    print(e)
+    traceback.print_exc()
 
 
 def run(client):
@@ -54,21 +44,20 @@ def run(client):
                 elif code == command.state:
                     pub_state.publish(data1)
                 elif code == command.arm:
-                    if data1:
-                        arm_set(data1, data2)
-                    else:
-                        claw_turn()
+                    arm_cli.send([data1, data2])
                 elif code == command.kill:
                     client.close()
             else:
                 continue
         except socket.error as e:
             print(e)
+            traceback.print_exc()
             client.close()
             del client
             return
         except Exception as e:
             print(e)
+            traceback.print_exc()
 
 
 def add_thread(client):

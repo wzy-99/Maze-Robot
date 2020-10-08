@@ -6,7 +6,7 @@ import traceback
 import threading
 from constant import Command
 from server import Server, get_host_ip
-from arm import arm_init, arm_set
+from arm import arm_init, arm_set, claw_turn
 
 import rospy
 from std_msgs.msg import Int32
@@ -54,7 +54,10 @@ def run(client):
                 elif code == command.state:
                     pub_state.publish(data1)
                 elif code == command.arm:
-                    arm_set(data1, data2)
+                    if data1:
+                        arm_set(data1, data2)
+                    else:
+                        claw_turn()
                 elif code == command.kill:
                     client.close()
             else:

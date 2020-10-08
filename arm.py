@@ -2,7 +2,7 @@ from _XiaoRGEEK_SERVO_ import XR_Servo
 
 Servo = XR_Servo()
 
-claw_num = 4
+claw_num = 1
 claw_close = 160
 claw_open = 0
 claw_state = 0  # 0 for close, 1 for open

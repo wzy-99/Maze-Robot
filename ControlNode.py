@@ -11,8 +11,6 @@ from multiprocessing.connection import Client
 import rospy
 from std_msgs.msg import Int32
 
-Servo = XR_Servo()
-
 HOST = get_host_ip()
 print(HOST)
 

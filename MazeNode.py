@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import rospy
 import traceback
@@ -9,9 +10,12 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
     try:
         maze_solution = MazeSolution()
-        while (not rospy.is_shutdown()) or maze_solution.over is False:
+        while not rospy.is_shutdown():
             try:
                 maze_solution.solve()
+                if maze_solution.over:
+                    print('maze out')
+                    break
             except Exception as e:
                 print(e)
                 traceback.print_exc()

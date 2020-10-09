@@ -14,17 +14,22 @@ class KinematicControl:
         state = StateEnum()
         self.stop = state.stop
         self.run_forward = state.run_forward
-        self.run_back = state.run_forward
+        self.run_back = state.run_back
         self.turn_left = state.turn_left
         self.turn_right = state.turn_right
         self.turn_back = state.turn_back
         self.turn_left_unblock = state.turn_left_unblock
         self.turn_right_unblock = state.turn_right_unblock
+        self.run_forward_time = state.run_forward_time
+        self.run_bakc_time = state.run_back_time
         del state
 
         # config variable
         self.turn_speed = 100
-        self.turn_dtime = 1.0
+        # self.turn_dtime = 1.05
+        self.turn_right_time = 1.05
+        self.turn_left_time = 0.85
+        self.run_time = 1.0
         self.adjust_k = 0.05
         self.angle_pd = PD(kd=-1.0, kp=-1.0, target=50.0)
 
@@ -66,13 +71,13 @@ class KinematicControl:
         if self.state_change:
             self.left_motor.set_forword()
             self.right_motor.set_back()
-            self.state_change = True
+            self.state_change = False
             self.left_speed = self.turn_speed
             self.right_speed = self.turn_speed
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
             self.start_time = time.time()
-            self.end_time = self.start_time + self.turn_dtime
+            self.end_time = self.start_time + self.turn_right_time
             self.block = True
         else:
             if time.time() < self.end_time:
@@ -83,7 +88,7 @@ class KinematicControl:
             else:
                 self.start_time = 0
                 self.end_time = 0
-                self.state = self.stop
+                self.state = self.run_forward_time
                 self.state_change = True
                 self.block = False
 
@@ -97,7 +102,7 @@ class KinematicControl:
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
             self.start_time = time.time()
-            self.end_time = self.start_time + self.turn_dtime
+            self.end_time = self.start_time + self.turn_left_time
             self.block = True
         else:
             if time.time() < self.end_time:
@@ -108,7 +113,7 @@ class KinematicControl:
             else:
                 self.start_time = 0
                 self.end_time = 0
-                self.state = self.stop
+                self.state = self.run_forward_time
                 self.state_change = True
                 self.block = False
 
@@ -129,8 +134,8 @@ class KinematicControl:
 
     def turn_right_unblock_(self):
         if self.state_change:
-            self.left_motor.set_back()
-            self.right_motor.set_forword()
+            self.left_motor.set_forword()
+            self.right_motor.set_back()
             self.state_change = False
             self.left_speed = self.turn_speed
             self.right_speed = self.turn_speed
@@ -152,7 +157,7 @@ class KinematicControl:
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
             self.start_time = time.time()
-            self.end_time = self.start_time + self.turn_dtime * 2
+            self.end_time = self.start_time + self.turn_right_time * 2
             self.block = True
         else:
             if time.time() < self.end_time:
@@ -177,6 +182,26 @@ class KinematicControl:
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
 
+    def run_forward_time_(self):
+        if self.state_change:
+            self.left_motor.set_forword()
+            self.right_motor.set_forword()
+            self.state_change = False
+            self.start_time = time.time()
+            self.end_time = self.start_time + self.run_time
+            self.block = True
+        else:
+            if time.time() < self.end_time:
+                self.dif_speed(self.speed, self.angle)
+                self.left_motor.set_speed(self.left_speed)
+                self.right_motor.set_speed(self.right_speed)
+            else:
+                self.start_time = 0
+                self.end_time = 0
+                self.state = self.stop
+                self.state_change = True
+                self.block = False
+
     def run_back_(self):
         if self.state_change:
             self.left_motor.set_back()
@@ -186,6 +211,26 @@ class KinematicControl:
             self.dif_speed(self.speed, 100 - self.angle)
             self.left_motor.set_speed(self.left_speed)
             self.right_motor.set_speed(self.right_speed)
+
+    def run_bakc_time_(self):
+        if self.state_change:
+            self.left_motor.set_back()
+            self.right_motor.set_back()
+            self.state_change = False
+            self.start_time = time.time()
+            self.end_time = self.start_time + self.run_time
+            self.block = True
+        else:
+            if time.time() < self.end_time:
+                self.dif_speed(self.speed, 100 - self.angle)
+                self.left_motor.set_speed(self.left_speed)
+                self.right_motor.set_speed(self.right_speed)
+            else:
+                self.start_time = 0
+                self.end_time = 0
+                self.state = self.stop
+                self.state_change = True
+                self.block = False
 
     def stop_(self):
         if self.state_change:
@@ -233,33 +278,57 @@ class KinematicControl:
             self.turn_left_unblock_()
         elif self.state == self.turn_right_unblock:
             self.turn_right_unblock_()
+        elif self.state == self.run_forward_time:
+            self.run_forward_time_()
+        elif self.state == self.run_bakc_time:
+            self.run_bakc_time_()
         self.left_motor.spin()
         self.right_motor.spin()
+        show(self)
+
+
+def show(ki):
+    print('speed', ki.speed)
+    print('angle', ki.angle)
+    print('state', ki.state)
+    print('chang', ki.state_change)
+    print('left ', ki.left_speed, ki.left_motor.speed, ki.left_motor.pwm_value)
+    print('right', ki.right_speed, ki.right_motor.speed, ki.right_motor.pwm_value)
+    print('time1', ki.end_time, 'time2', time.time())
 
 
 # for test
 if __name__ == '__main__':
     import RPi.GPIO as GPIO
-    from constant import Pin
+    from constant import Pin, StateEnum
     from peripheral import MotorOpen
+
+    state = StateEnum()
     pin_conf = Pin()
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
     motor_left = MotorOpen(pin_conf.left_pin1, pin_conf.left_pin2, pin_conf.left_enale)
     motor_right = MotorOpen(pin_conf.right_pin1, pin_conf.right_pin2, pin_conf.right_enale)
     kinematic = KinematicControl((motor_left, motor_right))
-    kinematic.set_speed(100)
-    kinematic.set_state(4)
-    while 1:
-        print('speed', kinematic.speed)
-        print('angle', kinematic.angle)
-        print('state', kinematic.state)
-        print('chang', kinematic.state_change)
-        print('left ', kinematic.left_speed, kinematic.left_motor.speed, kinematic.left_motor.pwm_value)
-        print('right', kinematic.right_speed, kinematic.right_motor.speed, kinematic.right_motor.pwm_value)
-        print('time1', kinematic.end_time, 'time2', time.time())
-        print('****************************')
-        kinematic.spin()
+
+    def test(dtime=5):
+        end_time = time.time() + dtime
+        while time.time() < end_time:
+            print('speed', kinematic.speed)
+            print('angle', kinematic.angle)
+            print('state', kinematic.state)
+            print('chang', kinematic.state_change)
+            print('left ', kinematic.left_speed, kinematic.left_motor.speed, kinematic.left_motor.pwm_value)
+            print('right', kinematic.right_speed, kinematic.right_motor.speed, kinematic.right_motor.pwm_value)
+            print('time1', kinematic.end_time, 'time2', time.time())
+            print('****************************')
+            kinematic.spin()
+
+
+    kinematic.set_state(state.run_forward)
+    test(2)
+    kinematic.set_state(state.turn_left)
+    test(2)
 
 
 # Car will turn left, turn right, (turn back,) go ahead, go back and stop.

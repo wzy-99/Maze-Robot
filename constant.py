@@ -41,6 +41,8 @@ class StateEnum:
         self.stop = 5
         self.turn_left_unblock = 7
         self.turn_right_unblock = 8
+        self.run_forward_time = 9
+        self.run_back_time = 10
 
 
 class DirctionEnum:
@@ -82,11 +84,11 @@ class Pin:
         self.ENB = 20
 
         # motor pins
-        self.left_pin1 = self.IN1
-        self.left_pin2 = self.IN2
+        self.left_pin1 = self.IN4
+        self.left_pin2 = self.IN3
         self.left_enale = self.ENA
-        self.right_pin1 = self.IN4
-        self.right_pin2 = self.IN3
+        self.right_pin1 = self.IN1
+        self.right_pin2 = self.IN2
         self.right_enale = self.ENB
 
         self.IR_L = 27

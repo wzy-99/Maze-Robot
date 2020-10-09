@@ -4,17 +4,17 @@ from multiprocessing.connection import Listener
 
 Servo = XR_Servo()
 
-claw_num = 1
-claw_close = 160
+claw_num = 4
+claw_close = 80
 claw_open = 0
 claw_state = 0  # 0 for close, 1 for open
 
 
 def arm_init():
-    Servo.XiaoRGEEK_SetServoAngle(1, 30)
-    Servo.XiaoRGEEK_SetServoAngle(2, 0)
-    Servo.XiaoRGEEK_SetServoAngle(3, 30)
-    Servo.XiaoRGEEK_SetServoAngle(4, 170)
+    Servo.XiaoRGEEK_SetServoAngle(1, 0)
+    Servo.XiaoRGEEK_SetServoAngle(2, 50)
+    Servo.XiaoRGEEK_SetServoAngle(3, 80)
+    Servo.XiaoRGEEK_SetServoAngle(4, 80)
 
 
 def arm_set(num, angle):
@@ -33,8 +33,13 @@ def claw_turn():
 def echo_client(conn):
     try:
         while True:
-            msg = conn.recv()
-            conn.send(msg)
+            _recv_ = conn.recv()
+            print('recv', _recv_)
+            number, data = _recv_
+            if number == 0:
+                claw_turn()
+            else:
+                arm_set(number, data)
     except EOFError:
         print('Connection closed')
 
@@ -44,7 +49,6 @@ def echo_server(address, authkey):
     while True:
         try:
             client = serv.accept()
-
             echo_client(client)
         except Exception as e:
             print(e)

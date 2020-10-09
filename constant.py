@@ -97,3 +97,6 @@ class Pin:
         # infrad pin
         self.left_infra_pin = self.IR_L
         self.right_infra_pin = self.IR_R
+
+        self.left_radar_echo = 4
+        self.left_radar_trig = 17

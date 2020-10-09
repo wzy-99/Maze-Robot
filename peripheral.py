@@ -107,36 +107,40 @@ class Radar:
         self.time_end = None
         self.obstacle = False
 
-        self.max_try_time = 100000
+        self.max_try_time = 0.1
+
+        self.init()
 
     def init(self):
         GPIO.setup(self.trig, GPIO.OUT, initial=GPIO.LOW)
-        GPIO.setup(self.echo, GPIO.IN, initial=GPIO.LOW)
+        GPIO.setup(self.echo, GPIO.IN)
 
     def get_distance(self):
         GPIO.output(self.trig, GPIO.HIGH)
         time.sleep(0.00001)
         GPIO.output(self.trig, GPIO.LOW)
-        max_try_time = self.max_try_time
-        try_time = 0
-        while GPIO.input(self.trig) == 0:
-            try_time = try_time + 1
-            if try_time > max_try_time:
-                self.distance = 100000
+
+        # wait for trig pin low
+        time_wait = time.time() + self.max_try_time
+        while GPIO.input(self.echo) == 0:
+            if time.time() > time_wait:
+                self.distance = 200000
                 return self.distance
             else:
                 continue
+
+        # wait for trig pin high
         self.time_start = time.time()
-        try_time = 0
-        while GPIO.input(self.trig) == 1:
-            try_time = try_time + 1
-            if try_time > max_try_time:
+        time_wait = time.time() + self.max_try_time
+        while GPIO.input(self.echo) == 1:
+            if time.time() > time_wait:
                 self.distance = 100000
                 return self.distance
             else:
                 continue
+
         self.time_end = time.time()
-        self.distance = (self.time_start - self.time_end) * 17150
+        self.distance = round((self.time_end - self.time_start) * 17150, 2)
         return self.distance
 
     def check_obstacle(self):
@@ -221,21 +225,27 @@ if __name__ == '__main__':
     from constant import Pin
     pin_conf = Pin()
     GPIO.setmode(GPIO.BCM)
-    # GPIO.setwarnings(False)
-    motor_left = MotorOpen(pin_conf.left_pin1, pin_conf.left_pin2, pin_conf.left_enale)
-    motor_right = MotorOpen(pin_conf.right_pin1, pin_conf.right_pin2, pin_conf.right_enale)
-    motor_left.set_speed(100)
-    motor_right.set_speed(100)
-    motor_left.spin()
-    motor_right.spin()
-    time.sleep(1)
-    motor_left.set_back()
-    motor_right.set_back()
-    motor_left.spin()
-    motor_right.spin()
-    time.sleep(1)
-    motor_left.set_forword()
-    motor_right.set_forword()
-    motor_left.spin()
-    motor_right.spin()
-    time.sleep(1)
+    GPIO.setwarnings(False)
+    # motor_left = MotorOpen(pin_conf.left_pin1, pin_conf.left_pin2, pin_conf.left_enale)
+    # motor_right = MotorOpen(pin_conf.right_pin1, pin_conf.right_pin2, pin_conf.right_enale)
+    # motor_left.set_speed(100)
+    # motor_right.set_speed(100)
+    # motor_left.spin()
+    # motor_right.spin()
+    # time.sleep(1)
+    # motor_left.set_back()
+    # motor_right.set_back()
+    # motor_left.spin()
+    # motor_right.spin()
+    # time.sleep(1)
+    # motor_left.set_forword()
+    # motor_right.set_forword()
+    # motor_left.spin()
+    # motor_right.spin()
+    # time.sleep(1)
+
+    print('trig', pin_conf.left_radar_trig, 'echo', pin_conf.left_radar_echo)
+    left_radar = Radar(pin_conf.left_radar_trig, pin_conf.left_radar_echo, 20)
+    while 1:
+        left_radar.spin()
+        print('distance', left_radar.distance)

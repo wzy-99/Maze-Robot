@@ -4,10 +4,14 @@ from multiprocessing.connection import Listener
 
 Servo = XR_Servo()
 
-claw_num = 4
 claw_close = 80
 claw_open = 0
+node1_in = 0
+node2_in = 50
+node1_out = 180
+node2_out = 180
 claw_state = 0  # 0 for close, 1 for open
+arm_state = 0  # 0 for in, 1 for out
 
 
 def arm_init():
@@ -24,10 +28,21 @@ def arm_set(num, angle):
 def claw_turn():
     global claw_state
     if claw_state:  # if open
-        Servo.XiaoRGEEK_SetServoAngle(claw_num, claw_close)
+        Servo.XiaoRGEEK_SetServoAngle(4, claw_close)
     else:
-        Servo.XiaoRGEEK_SetServoAngle(claw_num, claw_open)
+        Servo.XiaoRGEEK_SetServoAngle(4, claw_open)
     claw_state = 1 - claw_state
+
+
+def arm_turn():
+    global arm_state
+    if arm_state: # if out
+        Servo.XiaoRGEEK_SetServoAngle(2, node2_in)
+        Servo.XiaoRGEEK_SetServoAngle(1, node1_in)
+    else: # else in
+        Servo.XiaoRGEEK_SetServoAngle(2, node2_out)
+        Servo.XiaoRGEEK_SetServoAngle(1, node1_out)
+    arm_state = 1 - arm_state
 
 
 def echo_client(conn):
@@ -37,7 +52,10 @@ def echo_client(conn):
             print('recv', _recv_)
             number, data = _recv_
             if number == 0:
-                claw_turn()
+                if data == 0:
+                    claw_turn()
+                elif data == 1:
+                    arm_turn()
             else:
                 arm_set(number, data)
     except EOFError:

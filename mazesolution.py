@@ -96,7 +96,6 @@ class MazeSolution:
             self.change = True
 
     def accept_info(self, msg):
-        print('detect', msg.data)
         self.change = True
         data = msg.data
         font_detect = int(data / 1000)
@@ -104,7 +103,6 @@ class MazeSolution:
         left_detect = int((data - 1000 * font_detect - 100 * back_detect) / 10)
         right_detect = int(data - 1000 * font_detect - 100 * back_detect - 10 * left_detect)
         self.info = [font_detect, back_detect, left_detect, right_detect]
-        print('info', self.info)
 
     def update_map(self):
         """
@@ -138,7 +136,7 @@ class MazeSolution:
         :param info: [back,forward,left,right]
         :return:
         """
-        self.B = False # very important by zst
+        self.B = False  # very important by zst
         if len(self.maze[self.cur_loction.x][self.cur_loction.y].valid) > 0:
             key = random.choice(list(self.maze[self.cur_loction.x][self.cur_loction.y].valid))
             self.next_direction = key
@@ -171,10 +169,8 @@ class MazeSolution:
         if not self.maze[self.cur_loction.x][self.cur_loction.y].inPath:
             self.maze[self.cur_loction.x][self.cur_loction.y].inPath = True
             self.path.append(self.maze[self.cur_loction.x][self.cur_loction.y])
-        # print('walk')
 
     def send(self):
-        # print('send state', self.state)
         self.pub_turn.publish(self.state)
 
     def show_map(self):
@@ -228,20 +224,20 @@ class MazeSolution:
         if abs(delt) == 1:
             if delt > 0:
                 print('left')
-                self.state = state.turn_left
+                self.state = state.turn_left_time
             else:
                 print('right')
-                self.state = state.turn_right
+                self.state = state.turn_right_time
         elif abs(delt) == 3:
             if delt > 0:
                 print('right')
-                self.state = state.turn_right
+                self.state = state.turn_right_time
             else:
                 print('left')
-                self.state = state.turn_left
+                self.state = state.turn_left_time
         elif abs(delt) == 2:
             print('back')
-            self.state = state.turn_back
+            # self.state = state.turn_back
         elif abs(delt) == 0:
             if self.B:
                 print('back')

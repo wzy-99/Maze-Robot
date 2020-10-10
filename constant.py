@@ -33,16 +33,18 @@ class MotionInfo:
 
 class StateEnum:
     def __init__(self):
-        self.run_forward = 0
-        self.run_back = 1
-        self.turn_left = 2
-        self.turn_right = 3
-        self.turn_back = 4
-        self.stop = 5
-        self.turn_left_unblock = 7
-        self.turn_right_unblock = 8
-        self.run_forward_time = 9
-        self.run_back_time = 10
+        self.stop = 0
+        self.run_forward_time = 1
+        self.run_back_time = 2
+        self.turn_left_time = 3
+        self.turn_right_time = 4
+        # self.turn_left = 5
+        # self.turn_right = 6
+        # self.turn_back = 7
+        self.run_forward_unblock = 8
+        self.run_back_unblock = 9
+        self.turn_left_unblock = 10
+        self.turn_right_unblock = 11
 
 
 class DirctionEnum:

@@ -24,12 +24,12 @@ class ServoSystem:
         # self.right_encode = Encoder()
         self.left_motor = MotorOpen(pins.left_pin1, pins.left_pin2, pins.left_enale)
         self.right_motor = MotorOpen(pins.right_pin1, pins.right_pin2, pins.right_enale)
-        # self.font_infrared = InfraRed(pins.font_infra_pin)
+        self.font_infrared = InfraRed(pins.font_infra_pin)
         self.left_infrared = InfraRed(pins.left_infra_pin)
         self.right_infrared = InfraRed(pins.right_infra_pin)
         # self.font_rader = Radar()
-        self.left_rader = Radar(pins.left_radar_trig, pins.left_radar_echo)
-        self.right_rader = Radar(pins.right_radar_trig, pins.right_radar_echo)
+        # self.left_rader = Radar(pins.left_radar_trig, pins.left_radar_echo)
+        # self.right_rader = Radar(pins.right_radar_trig, pins.right_radar_echo)
         del pins
 
         # control instance
@@ -63,20 +63,22 @@ class ServoSystem:
 
     def infrared_spin(self):
         if self.kinematic.check_finish():
-            font_detect = 0
-            back_detect = 0
-            left_detect = self.left_infrared.check_obstacle()
-            right_detect = self.right_infrared.check_obstacle()
+            # print(input('next_step'))
+            font_detect = self.font_infrared.check_obstacle()
+            back_detect = 1
+            left_detect = self.right_infrared.check_obstacle()
+            right_detect = self.left_infrared.check_obstacle()
             result = font_detect * 1000 + back_detect * 100 + left_detect * 10 + right_detect
-            self.pub_detect.publish(result)
+            self.pub_detect.publish(Int32(result))
+            print('result', result)
 
-    def radar_spin(self):
-        left_distance = self.left_rader.get_distance()
-        right_distance = self.right_rader.get_distance()
-        self.kinematic.adjust_angle(left_distance, right_distance)
+    # def radar_spin(self):
+    #     left_distance = self.left_rader.get_distance()
+    #     right_distance = self.right_rader.get_distance()
+    #     self.kinematic.adjust_angle(left_distance, right_distance)
 
     def spin(self):
-        self.radar_spin()
+        # self.radar_spin()
         self.infrared_spin()
         self.kinematic.spin()
         # self.encode_spin()
@@ -87,6 +89,7 @@ if __name__ == '__main__':
     rate = rospy.Rate(20)
     try:
         servo_system = ServoSystem()
+        time.sleep(1)
         while not rospy.is_shutdown():
             try:
                 servo_system.spin()

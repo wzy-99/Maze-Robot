@@ -64,7 +64,7 @@ class MazeSolution:
 
         self.path = [self.maze[0][0]]
         self.info = []
-        self.exit = [self.maze[3][3], self.maze[4][2]]
+        self.exit = [self.maze[3][3], self.maze[4][3]]
         self.over = False
 
         self.pub_turn = rospy.Publisher("/state", Int32, queue_size=1)
@@ -96,13 +96,14 @@ class MazeSolution:
     #         self.change = True
 
     def accept_info(self, msg):
-        self.change = True
         data = msg.data
+        self.change = True
         font_detect = int(data / 1000)
         back_detect = int((data - 1000 * font_detect) / 100)
         left_detect = int((data - 1000 * font_detect - 100 * back_detect) / 10)
         right_detect = int(data - 1000 * font_detect - 100 * back_detect - 10 * left_detect)
         self.info = [font_detect, back_detect, left_detect, right_detect]
+        print('detect', self.info)
 
     def update_map(self):
         """

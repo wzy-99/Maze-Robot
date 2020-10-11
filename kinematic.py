@@ -18,7 +18,7 @@ class KinematicControl:
         # self.turn_dtime = 1.05
         self.turn_right_time = 1.05
         self.turn_left_time = 0.85
-        self.run_time = 1.0
+        self.run_time = 1.85
         self.run_unblock_time = 0.1
         self.turn_unblock_time = 0.1
         self.adjust_k = 0.05
@@ -291,7 +291,7 @@ class KinematicControl:
             self.turn_right_unblock_()
         self.left_motor.spin()
         self.right_motor.spin()
-        show(self)
+        # show(self)
 
 
 def show(ki):

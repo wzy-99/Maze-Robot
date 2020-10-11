@@ -78,10 +78,12 @@ class Pin:
 
         self.IR_L = 27
         self.IR_R = 18
+        self.IR_M = 22
 
         # infrad pin
         self.left_infra_pin = self.IR_L
         self.right_infra_pin = self.IR_R
+        self.font_infra_pin = self.IR_M
 
         self.left_radar_echo = 4
         self.left_radar_trig = 17

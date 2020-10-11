@@ -42,6 +42,7 @@ class KinematicControl:
         self.start_time = 0
         self.end_time = 0
         self.block = False
+        self.finish = True
 
     def set_state(self, _state_):
         if self.state != _state_ and self.block is False:
@@ -53,6 +54,13 @@ class KinematicControl:
 
     def set_speed(self, speed=0):
         self.speed = int(max(0, min(speed, 100)))
+
+    def check_finish(self):
+        if self.finish:
+            self.finish = False
+            return True
+        else:
+            return False
 
     def turn_right_time_(self):
         if self.state_change:
@@ -123,6 +131,7 @@ class KinematicControl:
                 self.state = state.stop
                 self.state_change = True
                 self.block = False
+                self.finish = True
 
     def run_back_time_(self):
         if self.state_change:
@@ -143,6 +152,7 @@ class KinematicControl:
                 self.state = state.stop
                 self.state_change = True
                 self.block = False
+                self.finish = True
 
     def run_forward_unblock_(self):
         if self.state_change:
@@ -241,8 +251,10 @@ class KinematicControl:
             self.right_motor.set_speed(self.right_speed)
 
     def adjust_angle(self, left_distance, right_distance):
-        d_distance = left_distance - right_distance
-        self.angle = self.angle_pd.update(d_distance * self.adjust_k)
+        if self.state == state.run_forward_time or \
+                self.state == state.run_back_time:
+            d_distance = left_distance - right_distance
+            self.angle = self.angle_pd.update(d_distance * self.adjust_k)
 
     def dif_speed(self, speed, angle):
         # TODO dif speed algorithm

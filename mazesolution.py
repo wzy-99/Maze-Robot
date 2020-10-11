@@ -68,7 +68,7 @@ class MazeSolution:
         self.over = False
 
         self.pub_turn = rospy.Publisher("/state", Int32, queue_size=1)
-        rospy.Subscriber("/grid", Int32, self.gridcallback, queue_size=3)
+        # rospy.Subscriber("/grid", Int32, self.gridcallback, queue_size=3)
         rospy.Subscriber("/detect", Int32, self.accept_info, queue_size=3)
 
         self.Xchange = {0: 0,
@@ -88,12 +88,12 @@ class MazeSolution:
                 m.append(Node(i, j))
             self.maze.append(m)
 
-    def gridcallback(self, msg):
-        if self.cur_grid == msg.data:
-            pass
-        else:
-            self.cur_grid = msg.data
-            self.change = True
+    # def gridcallback(self, msg):
+    #     if self.cur_grid == msg.data:
+    #         pass
+    #     else:
+    #         self.cur_grid = msg.data
+    #         self.change = True
 
     def accept_info(self, msg):
         self.change = True

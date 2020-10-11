@@ -20,17 +20,6 @@ class MazeInfo:
         self.maze_unknown = 5
 
 
-class RunMode:
-    def __init__(self):
-        self.mode_maze = 1
-        self.mode_treasure = 2
-
-
-class MotionInfo:
-    def __init__(self):
-        self.turn_speed = 10
-
-
 class StateEnum:
     def __init__(self):
         self.stop = 0
@@ -66,12 +55,6 @@ class DirctionEnum:
         self.E = 1
         self.S = 2
         self.W = 3
-
-
-class EncodeInfo:
-    def __init__(self):
-        self.count_per_cm = 50
-        self.cm_per_grid = 50
 
 
 class Pin:

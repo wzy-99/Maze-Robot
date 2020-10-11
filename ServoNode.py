@@ -28,14 +28,14 @@ class ServoSystem:
         self.left_infrared = InfraRed(pins.left_infra_pin)
         self.right_infrared = InfraRed(pins.right_infra_pin)
         # self.font_rader = Radar()
-        # self.left_rader = Radar()
-        # self.right_rader = Radar()
+        self.left_rader = Radar(pins.left_radar_trig, pins.left_radar_echo)
+        self.right_rader = Radar(pins.right_radar_trig, pins.right_radar_echo)
         del pins
 
         # control instance
         self.kinematic = KinematicControl((self.left_motor, self.right_motor))
 
-        self.pub_grid = rospy.Publisher("/grid", Int32, queue_size=1)
+        # self.pub_grid = rospy.Publisher("/grid", Int32, queue_size=1)
         self.pub_detect = rospy.Publisher("/detect", Int32, queue_size=1)
         rospy.Subscriber("/state", Int32, self.statecallback, queue_size=1)
         rospy.Subscriber("/speed", Int32, self.speedcallback, queue_size=10)
@@ -62,21 +62,23 @@ class ServoSystem:
     #     self.pub_grid.publish(grid)
 
     def infrared_spin(self):
-        font_detect = 0
-        back_detect = 0
-        left_detect = self.left_infrared.check_obstacle()
-        right_detect = self.right_infrared.check_obstacle()
-        result = font_detect * 1000 + back_detect * 100 + left_detect * 10 + right_detect
-        self.pub_detect.publish(result)
+        if self.kinematic.check_finish():
+            font_detect = 0
+            back_detect = 0
+            left_detect = self.left_infrared.check_obstacle()
+            right_detect = self.right_infrared.check_obstacle()
+            result = font_detect * 1000 + back_detect * 100 + left_detect * 10 + right_detect
+            self.pub_detect.publish(result)
 
-    # def radar_spin(self):
-    #     left_distance = self.left_rader.get_distance()
-    #     right_distance = self.right_rader.get_distance()
-    #     self.kinematic.adjust_angle(left_distance, right_distance)
+    def radar_spin(self):
+        left_distance = self.left_rader.get_distance()
+        right_distance = self.right_rader.get_distance()
+        self.kinematic.adjust_angle(left_distance, right_distance)
 
     def spin(self):
+        self.radar_spin()
+        self.infrared_spin()
         self.kinematic.spin()
-        # self.infrared_spin()
         # self.encode_spin()
 
 

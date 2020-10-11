@@ -2,7 +2,6 @@
 
 import time
 import RPi.GPIO as GPIO
-from constant import EncodeInfo
 
 
 class MotorOpen:
@@ -97,12 +96,12 @@ class InfraRed:
 
 
 class Radar:
-    def __init__(self, trig, echo, thres):
+    def __init__(self, trig, echo):
         self.trig = trig
         self.echo = echo
 
         self.distance = 0
-        self.thres_distance = thres
+        self.thres_distance = 1000
         self.time_start = None
         self.time_end = None
         self.obstacle = False
@@ -160,10 +159,8 @@ class Encoder:
         self.B = b
         self.init()
 
-        info = EncodeInfo()
-        self.count_per_cm = info.count_per_cm
-        self.cm_per_grid = info.cm_per_grid
-        del info
+        self.count_per_cm = 50
+        self.cm_per_grid = 50
 
         self.count = 0
         self.last_count = 0

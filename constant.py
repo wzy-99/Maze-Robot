@@ -23,17 +23,23 @@ class MazeInfo:
 class StateEnum:
     def __init__(self):
         self.stop = 0
-        self.run_forward_time = 1
-        self.run_back_time = 2
-        self.turn_left_time = 3
-        self.turn_right_time = 4
+        # self.run_forward_time = 1
+        # self.run_back_time = 2
+        # self.turn_left_time = 3
+        # self.turn_right_time = 4
         # self.turn_left = 5
         # self.turn_right = 6
         # self.turn_back = 7
-        self.run_forward_unblock = 8
-        self.run_back_unblock = 9
-        self.turn_left_unblock = 10
-        self.turn_right_unblock = 11
+        # self.run_forward_unblock = 8
+        # self.run_back_unblock = 9
+        # self.turn_left_unblock = 10
+        # self.turn_right_unblock = 11
+        # self.run_forward_distance = 12
+        # self.run_back_distance = 13
+        self.turn_right_distance = 14
+        self.turn_left_distance = 15
+        self.forward_distance = 16
+        self.backward_distance = 17
 
 
 class DirctionEnum:
@@ -87,3 +93,8 @@ class Pin:
 
         self.left_radar_echo = 4
         self.left_radar_trig = 17
+
+        self.left_encode_a = 25
+        self.left_encode_b = 5
+        self.right_encode_a = 6
+        self.right_encode_b = 12

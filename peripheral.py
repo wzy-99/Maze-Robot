@@ -175,7 +175,8 @@ class Encoder:
         GPIO.setup(self.B, GPIO.IN)
         GPIO.add_event_detect(self.A, GPIO.RISING, callback=self.count_callback)
 
-    def count_callback(self):
+    def count_callback(self, value):
+        # print('value', value)
         current_a = GPIO.input(self.A)
         current_b = GPIO.input(self.B)
         if current_a:
@@ -208,6 +209,9 @@ class Encoder:
             self.renew = True
             self.last_grid = self.grid
         return self.grid
+
+    def clear(self):
+        self.count = 0
 
     def new_grid(self):
         if self.renew:

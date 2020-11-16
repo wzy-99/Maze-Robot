@@ -52,8 +52,12 @@ class MazeSolution:
         self.maze_map = None
         self.maze = []
         self.create_map([self.maze_unknown, self.maze_unknown])
+        # self.cur_loction = self.maze[2][3]
+        # self.next_loction = self.maze[2][3]
         self.cur_loction = self.maze[0][0]
         self.next_loction = self.maze[0][0]
+        # self.cur_direction = self.N
+        # self.next_direction = self.N
         self.cur_direction = self.E
         self.next_direction = self.E
         self.cur_grid = 0
@@ -62,8 +66,10 @@ class MazeSolution:
 
         self.state = -2
 
+        # self.path = [self.maze[2][3]]
         self.path = [self.maze[0][0]]
         self.info = []
+        # self.exit = [self.maze[0][0]]
         self.exit = [self.maze[3][3], self.maze[4][3]]
         self.over = False
 
@@ -137,8 +143,12 @@ class MazeSolution:
         :param info: [back,forward,left,right]
         :return:
         """
+
         self.B = False  # very important by zst
         if len(self.maze[self.cur_loction.x][self.cur_loction.y].valid) > 0:
+            # if self.cur_loction.x == 1 and self.cur_loction.y == 1:
+            #     key = self.E
+            # else:
             key = random.choice(list(self.maze[self.cur_loction.x][self.cur_loction.y].valid))
             self.next_direction = key
             self.maze[self.cur_loction.x][self.cur_loction.y].valid.pop(key)
@@ -225,27 +235,34 @@ class MazeSolution:
         if abs(delt) == 1:
             if delt > 0:
                 print('left')
-                self.state = state.turn_left_time
+                # self.state = state.turn_left_time
+                self.state = state.turn_left_distance
             else:
                 print('right')
-                self.state = state.turn_right_time
+                # self.state = state.turn_right_time
+                self.state = state.turn_right_distance
         elif abs(delt) == 3:
             if delt > 0:
                 print('right')
-                self.state = state.turn_right_time
+                # self.state = state.turn_right_time
+                self.state = state.turn_right_distance
             else:
                 print('left')
-                self.state = state.turn_left_time
+                # self.state = state.turn_left_time
+                self.state = state.turn_left_distance
         elif abs(delt) == 2:
             print('back')
             # self.state = state.turn_back
         elif abs(delt) == 0:
             if self.B:
                 print('back')
-                self.state = state.run_back_time
+                # self.state = state.run_back_time
+                self.state = state.backward_distance
             else:
                 print('run')
-                self.state = state.run_forward_time
+                # self.state = state.run_forward_time
+                self.state = state.forward_distance
+
 
 # if __name__ == '__main__':
 #     maze = MazeSolution()

@@ -36,10 +36,14 @@ class StateEnum:
         # self.turn_right_unblock = 11
         # self.run_forward_distance = 12
         # self.run_back_distance = 13
-        self.turn_right_distance = 14
-        self.turn_left_distance = 15
-        self.forward_distance = 16
-        self.backward_distance = 17
+        # self.turn_right_distance = 14
+        # self.turn_left_distance = 15
+        # self.forward_distance = 16
+        # self.backward_distance = 17
+        self.E_distance = 18
+        self.W_distance = 19
+        self.S_distance = 20
+        self.N_distance = 21
 
 
 class DirctionEnum:
@@ -74,6 +78,13 @@ class Pin:
         self.ENA = 13
         self.ENB = 20
 
+        self.IRF_R = 16
+        self.IRF_L = 17
+
+        self.IR_L = 27
+        self.IR_R = 18
+        self.IR_M = 22
+
         # motor pins
         self.left_pin1 = self.IN4
         self.left_pin2 = self.IN3
@@ -82,14 +93,11 @@ class Pin:
         self.right_pin2 = self.IN2
         self.right_enale = self.ENB
 
-        self.IR_L = 27
-        self.IR_R = 18
-        self.IR_M = 22
-
         # infrad pin
         self.left_infra_pin = self.IR_L
         self.right_infra_pin = self.IR_R
         self.font_infra_pin = self.IR_M
+        self.back_infra_pin = self.IRF_R
 
         self.left_radar_echo = 4
         self.left_radar_trig = 17

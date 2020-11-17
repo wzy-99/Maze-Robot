@@ -23,6 +23,7 @@ class ServoSystem:
         self.font_infrared = InfraRed(pins.font_infra_pin)
         self.left_infrared = InfraRed(pins.left_infra_pin)
         self.right_infrared = InfraRed(pins.right_infra_pin)
+        self.back_infrared = InfraRed(pins.back_infra_pin)
         # self.left_rader = Radar(pins.left_radar_trig, pins.left_radar_echo)
         # self.right_rader = Radar(pins.right_radar_trig, pins.right_radar_echo)
 
@@ -46,7 +47,7 @@ class ServoSystem:
 
     def infrared_spin(self):
         if self.kinematic.check_finish():
-            back_detect = 1
+            back_detect = self.back_infrared.check_obstacle()
             font_detect = self.font_infrared.check_obstacle()
             left_detect = self.right_infrared.check_obstacle()
             right_detect = self.left_infrared.check_obstacle()

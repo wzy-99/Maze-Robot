@@ -10,7 +10,9 @@ from std_msgs.msg import Int32
 
 state = StateEnum()
 
-dir = {'E':18,'W':19,'S':20,'N':21}
+Dir = {0: state.N_distance, 1: state.E_distance, 2: state.S_distance,
+       3: state.W_distance}  # NESW(0,1,2,3) to (21,18,20,19)
+
 
 class Node:
     def __init__(self, x, y):
@@ -53,24 +55,19 @@ class MazeSolution:
         self.maze_map = None
         self.maze = []
         self.create_map([self.maze_unknown, self.maze_unknown])
-        # self.cur_loction = self.maze[2][3]
-        # self.next_loction = self.maze[2][3]
         self.cur_loction = self.maze[0][0]
         self.next_loction = self.maze[0][0]
-        # self.cur_direction = self.N
-        # self.next_direction = self.N
-        self.cur_direction = self.E
-        self.next_direction = self.E
+        self.cur_direction_actual = self.E  # actually direction ,it is the real direciton of car currently,and it is alwayse E
+        self.cur_direction_virtual = self.E  # virtual direction ,in fact ,it is not exist!!
+        self.next_direction_virtual = self.E
         self.cur_grid = 0
         self.is_new_grid = False
         self.change = False
 
         self.state = -2
 
-        # self.path = [self.maze[2][3]]
         self.path = [self.maze[0][0]]
         self.info = []
-        # self.exit = [self.maze[0][0]]
         self.exit = [self.maze[3][3], self.maze[4][3]]
         self.over = False
 
@@ -122,12 +119,15 @@ class MazeSolution:
         if not self.maze[self.cur_loction.x][self.cur_loction.y].visited:
             for i in range(4):
                 offset = self.Xchange[i]
-                real_direction = (self.cur_direction + offset) % 4
+                real_direction = (
+                                         self.cur_direction_actual + offset) % 4  # solve Maze condition must use actually direction --- E, and always in this Xchage rule!!!!
                 self.maze[self.cur_loction.x][self.cur_loction.y].road[real_direction] = self.info[i]
             self.maze[self.cur_loction.x][self.cur_loction.y].visited = True
+
         if not self.maze[self.cur_loction.x][self.cur_loction.y].is_valid:
             print('not in path')
-            back_direction = (self.cur_direction + 2) % 4
+            back_direction = (
+                                     self.cur_direction_virtual + 2) % 4  # solve back_direction and recall must use virtual direction
             self.maze[self.cur_loction.x][self.cur_loction.y].road[
                 back_direction] = -1
             for k, v in self.maze[self.cur_loction.x][self.cur_loction.y].road.items():
@@ -144,14 +144,10 @@ class MazeSolution:
         :param info: [back,forward,left,right]
         :return:
         """
-
         self.B = False  # very important by zst
         if len(self.maze[self.cur_loction.x][self.cur_loction.y].valid) > 0:
-            if self.cur_loction.x == 1 and self.cur_loction.y == 1:
-                key = self.W
-            else:
-                key = random.choice(list(self.maze[self.cur_loction.x][self.cur_loction.y].valid))
-            self.next_direction = key
+            key = random.choice(list(self.maze[self.cur_loction.x][self.cur_loction.y].valid))
+            self.next_direction_virtual = key
             self.maze[self.cur_loction.x][self.cur_loction.y].valid.pop(key)
 
         else:
@@ -165,26 +161,24 @@ class MazeSolution:
             self.maze[self.cur_loction.x][self.cur_loction.y].inPath = False
             self.cur_loction = self.path[-1]
         else:
-            if self.next_direction == self.N:
+            if self.next_direction_virtual == self.N:
                 self.next_loction = self.maze[self.cur_loction.x - 1][self.cur_loction.y]
-            elif self.next_direction == self.E:
+            elif self.next_direction_virtual == self.E:
                 self.next_loction = self.maze[self.cur_loction.x][self.cur_loction.y + 1]
-            elif self.next_direction == self.S:
+            elif self.next_direction_virtual == self.S:
                 self.next_loction = self.maze[self.cur_loction.x + 1][self.cur_loction.y]
-            elif self.next_direction == self.W:
+            elif self.next_direction_virtual == self.W:
                 self.next_loction = self.maze[self.cur_loction.x][self.cur_loction.y - 1]
-            print('walk_next_next_direction', self.next_direction)
+            print('walk_next_next_direction', self.next_direction_virtual)
             self.cur_loction = self.next_loction
-        self.turn()
-        self.cur_direction = self.next_direction
+        self.set_state()
+        self.cur_direction_virtual = self.next_direction_virtual
 
         if not self.maze[self.cur_loction.x][self.cur_loction.y].inPath:
             self.maze[self.cur_loction.x][self.cur_loction.y].inPath = True
             self.path.append(self.maze[self.cur_loction.x][self.cur_loction.y])
 
     def send(self):
-        order = input("please input order!!!")
-        self.state = int(order)
         self.pub_turn.publish(self.state)
 
     def show_map(self):
@@ -196,7 +190,7 @@ class MazeSolution:
         #                 print(self.maze_map[i][j], end='     ')
         #         print('\n')
         print('-----------------------------------------\n')
-        print('cur dir:', self.cur_direction)
+        print('cur dir:', self.cur_direction_virtual)
         print('cur pos:', self.cur_loction.x, self.cur_loction.y)
         print('cur road:', self.maze[self.cur_loction.x][self.cur_loction.y].road)
         print('cur valid:', self.maze[self.cur_loction.x][self.cur_loction.y].valid)
@@ -219,12 +213,12 @@ class MazeSolution:
 
     def solve(self):
         if self.change:
-            # self.update_map()
-            # self.get_next_direction()
-            # self.walk()
+            self.update_map()
+            self.get_next_direction()
+            self.walk()
             self.send()
-            # self.show_map()
-            # self.is_out()
+            self.show_map()
+            self.is_out()
             self.change = False
         else:
             pass
@@ -233,39 +227,18 @@ class MazeSolution:
         for i in self.path:
             print("X:", i.x, "Y:", i.y)
 
-    def turn(self):
-        delt = self.cur_direction - self.next_direction
-        if abs(delt) == 1:
-            if delt > 0:
-                print('left')
-                # self.state = state.turn_left_time
-                self.state = state.turn_left_distance
-            else:
-                print('right')
-                # self.state = state.turn_right_time
-                self.state = state.turn_right_distance
-        elif abs(delt) == 3:
-            if delt > 0:
-                print('right')
-                # self.state = state.turn_right_time
-                self.state = state.turn_right_distance
-            else:
-                print('left')
-                # self.state = state.turn_left_time
-                self.state = state.turn_left_distance
-        elif abs(delt) == 2:
-            print('back')
-            # self.state = state.turn_back
-        elif abs(delt) == 0:
+    def set_state(self):
+        delt = self.cur_direction_virtual - self.next_direction_virtual
+        if abs(delt) == 0:
             if self.B:
-                print('back')
-                # self.state = state.run_back_time
-                self.state = state.backward_distance
+                print('back and recall !!!!!')
+                back_direction = (self.cur_direction_virtual + 2) % 4
+                self.state = Dir[back_direction]
             else:
-                print('run')
-                # self.state = state.run_forward_time
-                self.state = state.forward_distance
-
+                print('run forward !!!!!!!!!')
+                self.state = Dir[self.next_direction_virtual]
+        else:
+            self.state = Dir[self.next_direction_virtual]
 
 # if __name__ == '__main__':
 #     maze = MazeSolution()

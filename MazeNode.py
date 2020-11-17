@@ -2,7 +2,7 @@
 
 import rospy
 import traceback
-from mazesolution import MazeSolution
+from mazesolutionV2 import MazeSolution
 
 
 if __name__ == '__main__':
